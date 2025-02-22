@@ -8,6 +8,9 @@ from telegram import Bot
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
+if not TELEGRAM_BOT_TOKEN or not CHAT_ID:
+    raise ValueError("Le variabili d'ambiente TELEGRAM_BOT_TOKEN e CHAT_ID devono essere impostate.")
+
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 # API di CoinGecko per ottenere il prezzo di Pi Network
@@ -18,16 +21,20 @@ THRESHOLD = 0.10  # 10% di variazione
 
 async def send_telegram_message(msg_text):
     """Invia un messaggio al gruppo Telegram in modo asincrono."""
-    await bot.send_message(chat_id=CHAT_ID, text=msg_text)
+    try:
+        await bot.send_message(chat_id=CHAT_ID, text=msg_text)
+    except Exception as e:
+        print(f"Errore nell'invio del messaggio: {e}")
 
 def get_pi_price():
     """Ottiene il prezzo attuale di Pi Network da CoinGecko."""
     try:
         response = requests.get(COINGECKO_API_URL)
+        response.raise_for_status()
         data = response.json()
-        return data["pi-network"]["usd"]
+        return data.get("pi-network", {}).get("usd")
     except Exception as e:
-        print("Errore nel recupero del prezzo:", e)
+        print(f"Errore nel recupero del prezzo: {e}")
         return None
 
 async def main():
@@ -38,9 +45,12 @@ async def main():
             if last_price is None:
                 last_price = current_price
             
-            variation = abs((current_price - last_price) / last_price)
-            if variation >= THRESHOLD:
-                msg_text = f"⚠️ Variazione del prezzo di Pi Network!\n\n💰 Prezzo attuale: ${current_price:.4f}\n📉 Variazione del {variation * 100:.2f}%"
+            variation = (current_price - last_price) / last_price
+            variation_percent = variation * 100
+            trend = "📈 Aumento" if variation > 0 else "📉 Diminuzione"
+            
+            if abs(variation) >= THRESHOLD:
+                msg_text = f"⚠️ {trend} del prezzo di Pi Network!\n\n💰 Prezzo attuale: ${current_price:.4f}\n📊 Variazione: {variation_percent:.2f}%"
                 await send_telegram_message(msg_text)
                 last_price = current_price  # Aggiorna il prezzo registrato
 
