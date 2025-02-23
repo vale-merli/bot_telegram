@@ -1,12 +1,11 @@
-import os
 import requests
 import time
 import asyncio
 from telegram import Bot
 
 # Configura il tuo bot Telegram
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")  # ID del gruppo dove inviare i messaggi
+TELEGRAM_BOT_TOKEN = "7757079154:AAEKdNe3pdLySYODGi08Vum0ucq9rtyLQgQ"
+CHAT_ID = "-1002287171993"  # ID del gruppo dove inviare i messaggi
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 # API di CoinGecko per ottenere il prezzo di Pi Network
@@ -52,8 +51,13 @@ async def main():
                 msg_text = f"⚠️ Variazione del prezzo di Pi Network!\n\n💰 Prezzo attuale: ${current_price:.4f}\n📉 Variazione del {variation * 100:.2f}%"
                 await send_telegram_message(msg_text)
                 last_price = current_price  # Aggiorna il prezzo registrato
-         await asyncio.sleep(60)  # Controlla il prezzo ogni minuto
-        import threading
+
+        await asyncio.sleep(60)  # Controlla il prezzo ogni minuto
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+import threading
 import time
 import os
 
@@ -75,7 +79,3 @@ threading.Thread(target=keep_alive, daemon=True).start()
 if __name__ == "__main__":
     import asyncio
     asyncio.run(main())  # Assicurati che questa sia la tua funzione principale
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
