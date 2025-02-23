@@ -43,6 +43,7 @@ def get_pi_price():
 
 
 async def main():
+      print("[DEBUG] Il bot ha avviato il loop e sta funzionando!")  # 🔹 Debug avvio
     global last_price
     while True:
         print("[DEBUG] Controllo del prezzo...")
