@@ -1,10 +1,6 @@
 import os
 import requests
-import time
 import asyncio
-import threading
-import http.server
-import socketserver
 from telegram import Bot
 
 # Usa variabili d'ambiente per proteggere i dati sensibili
@@ -44,6 +40,8 @@ def get_pi_price():
 
 async def main():
     print("[DEBUG] Il bot ha avviato il loop e sta funzionando!")  # 🔹 Debug avvio
+    await send_telegram_message("🚀 Il bot è attivo su Railway e sta funzionando!")
+
     global last_price
     while True:
         print("[DEBUG] Controllo del prezzo...")
@@ -64,18 +62,7 @@ async def main():
         await asyncio.sleep(60)  # Controlla il prezzo ogni minuto
 
 
-# Keep-Alive Trick per Render (finta app web)
-def keep_alive():
-    PORT = int(os.environ.get("PORT", 8080))  # Render cercherà questa porta
-    handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
-        print(f"🔄 Keep-Alive Server in esecuzione sulla porta {PORT}")
-        httpd.serve_forever()
-
-
-# Avvia il Keep-Alive Server in un thread separato
-threading.Thread(target=keep_alive, daemon=True).start()
-
 # Avvia il bot Telegram
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
