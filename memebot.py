@@ -52,8 +52,29 @@ async def main():
                 msg_text = f"⚠️ Variazione del prezzo di Pi Network!\n\n💰 Prezzo attuale: ${current_price:.4f}\n📉 Variazione del {variation * 100:.2f}%"
                 await send_telegram_message(msg_text)
                 last_price = current_price  # Aggiorna il prezzo registrato
+         await asyncio.sleep(60)  # Controlla il prezzo ogni minuto
+        import threading
+import time
+import os
 
-        await asyncio.sleep(60)  # Controlla il prezzo ogni minuto
+# Keep-Alive Trick per Render (finta app web)
+def keep_alive():
+    import http.server
+    import socketserver
+
+    PORT = int(os.environ.get("PORT", 8080))  # Render cercherà questa porta
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", PORT), handler) as httpd:
+        print(f"Server Keep-Alive in esecuzione sulla porta {PORT}")
+        httpd.serve_forever()
+
+# Avvia il Keep-Alive Server in un thread separato
+threading.Thread(target=keep_alive, daemon=True).start()
+
+# Esegui il codice principale del bot Telegram
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())  # Assicurati che questa sia la tua funzione principale
 
 
 if __name__ == "__main__":
