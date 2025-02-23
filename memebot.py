@@ -1,7 +1,3 @@
-Codice controllo prezzo pi network
-
-
-
 import requests
 import time
 import asyncio
